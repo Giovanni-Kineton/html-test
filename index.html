@@ -2,48 +2,141 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebView Test</title>
+
   <style>
     body {
       font-family: sans-serif;
-      padding: 20px;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      box-sizing: border-box;
     }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+    }
+
+    .back-button {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    /* Center content */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .process-buttons {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .process-buttons button {
+      flex: 1;
+      padding: 12px 6px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    /* Footer / extra actions */
+    .footer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     button {
-      padding: 12px 20px;
+      padding: 12px;
       font-size: 16px;
-      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
+
 <body>
 
-  <h1>Test WebView</h1>
+  <!-- Header -->
+  <div class="header">
+    <button class="back-button" id="backButton">INDIETRO</button>
+  </div>
 
-  <button id="testButton">Cliccami</button>
+  <!-- Main content -->
+  <div class="content">
 
-  <form id="testForm">
-    <input type="text" placeholder="Scrivi qualcosa" required />
-    <button type="submit">Invia form</button>
-  </form>
+    <div class="process-buttons">
+      <button id="startButton">AVVIA</button>
+      <button id="pendingButton">ELABORAZIONE<br/>IN CORSO...</button>
+      <button id="completedButton">FINITO</button>
+    </div>
+
+    <button id="errorButton">IMPOSTA ERRORE</button>
+
+    <button id="homeButton" class="hidden">HOME</button>
+
+  </div>
 
   <script>
-    function sendMessage(type, payload) {
+    function sendMessage(type, id) {
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type, payload })
+          JSON.stringify({
+            type,
+            id,
+            meta: {
+              timestamp: Date.now()
+            }
+          })
         );
       }
     }
 
-    document.getElementById('testButton')
+    // ACTIONS
+    document.getElementById('backButton')
       .addEventListener('click', () => {
-        sendMessage('BUTTON_CLICK', { id: 'testButton' });
+        sendMessage('ACTION', 'EXIT');
       });
 
-    document.getElementById('testForm')
-      .addEventListener('submit', (e) => {
-        e.preventDefault();
-        sendMessage('FORM_SUBMIT', { timestamp: Date.now() });
+    document.getElementById('homeButton')
+      .addEventListener('click', () => {
+        sendMessage('ACTION', 'SUCCEEDED');
+      });
+
+    // STATES
+    document.getElementById('startButton')
+      .addEventListener('click', () => {
+        sendMessage('STATE', 'NOT_STARTED');
+      });
+
+    document.getElementById('pendingButton')
+      .addEventListener('click', () => {
+        sendMessage('STATE', 'PENDING');
+      });
+
+    document.getElementById('completedButton')
+      .addEventListener('click', () => {
+        sendMessage('STATE', 'COMPLETED');
+        document.getElementById('homeButton').classList.remove('hidden');
+      });
+
+    document.getElementById('errorButton')
+      .addEventListener('click', () => {
+        sendMessage('STATE', 'ERROR');
       });
   </script>
 
