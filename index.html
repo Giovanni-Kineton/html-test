@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebView Test</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Test WebView</h1>
+
+  <button id="testButton">Cliccami</button>
+
+  <form id="testForm">
+    <input type="text" placeholder="Scrivi qualcosa" required />
+    <button type="submit">Invia form</button>
+  </form>
+
+  <script>
+    function sendMessage(type, payload) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type, payload })
+        );
+      }
+    }
+
+    document.getElementById('testButton')
+      .addEventListener('click', () => {
+        sendMessage('BUTTON_CLICK', { id: 'testButton' });
+      });
+
+    document.getElementById('testForm')
+      .addEventListener('submit', (e) => {
+        e.preventDefault();
+        sendMessage('FORM_SUBMIT', { timestamp: Date.now() });
+      });
+  </script>
+
+</body>
+</html>
